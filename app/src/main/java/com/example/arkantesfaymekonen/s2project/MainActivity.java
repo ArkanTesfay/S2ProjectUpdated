@@ -1,10 +1,13 @@
 package com.example.arkantesfaymekonen.s2project;
 
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -61,10 +64,13 @@ public class MainActivity extends AppCompatActivity {
     TextView score;
     Button TrueButton;
     Button FalseButton;
-    Button nextButton;
 
     private int counter=0;
-    private int QCounter=0;
+    private int QCounter=1;
+    private int timeCounter=0;
+    private int delayCounter=0;
+    private CountDownTimer countDownTimer;
+    private CountDownTimer delayTime;
 
 
 
@@ -75,34 +81,75 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         signed_username=(TextView)findViewById(R.id.nameTV);
+        counter=0;
+        countDownTimer=new CountDownTimer(15000,1000)
+        {
+
+            @Override
+            public void onTick(long l) {
+                timeCounter=timeCounter+1;
+                score.setText(String.valueOf(timeCounter));
+            }
+
+            @Override
+            public void onFinish() {
+                Question.setText(qs[QCounter].getQuestion());
+                delayTime.start();
+
+                timeCounter=0;
+
+            }
+        }.start();
+        delayTime=new CountDownTimer(5000,1000) {
+            @Override
+            public void onTick(long l) {
+                Question.setText(qs[QCounter].getQuestion());
+
+            }
+
+            @Override
+            public void onFinish() {
+                QCounter++;
+                Question.setText(qs[QCounter].getQuestion());
+                timeCounter=0;
+                countDownTimer.start();
+
+            }
+        };
+
+
+
+
+
+
 
         String name=getIntent().getStringExtra("username");
-        signed_username.setText(name);
+        signed_username.setText(name+" is Playing ");
 
         Answer=(TextView)findViewById(R.id.answerTV);
         Question=(TextView)findViewById(R.id.questionTv);
         score=(TextView)findViewById(R.id.scoreTV);
         TrueButton=(Button)findViewById(R.id.trueBT);
         FalseButton=(Button)findViewById(R.id.falseBT);
-        nextButton=(Button)findViewById(R.id.nextBt);
         score.setText(String.valueOf(counter));
         Question.setText(qs[QCounter].getQuestion());
 
         TrueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                TrueButton.setEnabled(false);
+                FalseButton.setEnabled(false);
+
+
+
+
+
                 Answer.setText(qs[QCounter].getAnswer());
                 Answer.setVisibility(View.VISIBLE);
-                if (counter==0)
-                {
-                    counter=0;
-                }else if (qs[QCounter].isTrueOrfalse()==true){
-                    counter++;
 
-                }else if (qs[QCounter].isTrueOrfalse()==false)
-                {
-                    counter--;
-                }
+
+                    if (qs[QCounter].isTrueOrfalse()==true){
+                    }
 
 
 
@@ -112,30 +159,23 @@ public class MainActivity extends AppCompatActivity {
         FalseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                FalseButton.setEnabled(false);
+                TrueButton.setEnabled(false);
                 Answer.setVisibility(View.VISIBLE);
                 Answer.setText(qs[QCounter].getAnswer());
+                timeCounter=0;
+               delayTime.start();
 
-                if (counter==0)
-                {
-                    counter=0;
-                }else if (qs[QCounter].isTrueOrfalse()==false){
-                    counter++;
 
-                }else if (qs[QCounter].isTrueOrfalse()==true)                {
-                    counter--;
-                }
+                    if (qs[QCounter].isTrueOrfalse()==false){
+
+                    }
+
 
             }
         });
 
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                QCounter++;
-                Answer.setVisibility(View.INVISIBLE);
 
-            }
-        });
 
 
 
